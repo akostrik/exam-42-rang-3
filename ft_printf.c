@@ -8,10 +8,7 @@ int	put_digit(long n, int base)
 	char	*hex = "0123456789abcdef";
 
 	if (n < 0)
-	{
-		write(1, "-", 1);
-		return (1 + put_digit(-n, base));
-	}
+		return (write(1, "-", 1) + put_digit(-n, base));
 	if (n < base)
 		return (write(1, &hex[n], 1));
 	return (put_digit(n / base, base) + write(1, &hex[n % base], 1));
