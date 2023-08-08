@@ -44,7 +44,7 @@ int	ft_printf(const char *f, ...)
 			len += put_str(va_arg(args, char *));
 		else
 			len += write(1, f, 1);
-		if ((*f == '%' && *(f + 1) == 'd') || (*f == '%' && *(f + 1) == 'x') || (*f == '%' && *(f + 1) == 's'))
+		if (*f == '%' && (*(f + 1) == 'd' || *(f + 1) == 'x' || *(f + 1) == 's'))
 			f++;
 		f++;
 	}
