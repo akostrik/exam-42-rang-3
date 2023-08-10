@@ -6,8 +6,7 @@
 int	put_number(long n, int base)
 {
 	char	*hex = "0123456789abcdef";
-	int len = 0;
-	int len2 = 0;
+	int 	len = 0;
 
 	if (n < 0)
 	{
@@ -58,15 +57,17 @@ int	ft_printf(const char *f, ...)
 	va_start(args, f);
 	while (*f)
 	{
-		if (*f == '%' && *(f + 1) == 'd')
+		if (*f == '%' && *(f + 1) != 'd' && *(f + 1) != 'x' && *(f + 1) != 's')
+		{
+			va_end(args);
+			return (-1);
+		}
+		else if (*f == '%' && *(f + 1) == 'd')
 			len0 = put_number((long)va_arg(args, int), 10);
 		else if (*f == '%' && *(f + 1) == 'x')
 			len0 = put_number((long)va_arg(args, unsigned int), 16);
 		else if (*f == '%' && *(f + 1) == 's')
 			len0 = put_str(va_arg(args, char *));
-		//else if (*f == '%' && *(f + 1) != 'd' && *(f + 1) != 'x' && *(f + 1) != 's')
-		//{
-		//}
 		else
 			len0 = write(1, f, 1);
 		if (len0 < 0)
@@ -109,6 +110,9 @@ int main()
 	int n17  =    printf(""); printf(" (return %d)\n", n17);
 	int n18  = ft_printf(""); printf(" (return %d)\n\n", n18);
 
+	int n31  =    printf("\0"); printf(" (return %d)\n", n31);
+	int n32  = ft_printf("\0"); printf(" (return %d)\n\n", n32);
+
 	int n19  =    printf("", 42); printf(" (return %d)\n", n19);
 	int n20  = ft_printf("", 42); printf(" (return %d)\n\n", n20);
 
@@ -121,6 +125,12 @@ int main()
 	int n25  =    printf("%x %x %x", NULL, "toto", 99999999999999999999); printf(" (return %d)\n", n25);
 	int n26  = ft_printf("%x %x %x", NULL, "toto", 99999999999999999999); printf(" (return %d)\n\n", n26);
 
-	int n27  =    printf("%r", 42); printf(" (return %d)\n", n27);
-	int n28  = ft_printf("%r", 42); printf(" (return %d)\n\n", n28);
+	int n27  =    printf("test %j", 42); printf(" (return %d)\n", n27);
+	int n28  = ft_printf("test %j", 42); printf(" (return %d)\n\n", n28);
+
+	int n35  =    printf("test %z", 42); printf(" (return %d)\n", n35);
+	int n36  = ft_printf("test %z", 42); printf(" (return %d)\n\n", n36);
+
+	int n33  =    printf("test %", 42); printf(" (return %d)\n", n33);
+	int n34  = ft_printf("test %", 42); printf(" (return %d)\n\n", n34);
 }
