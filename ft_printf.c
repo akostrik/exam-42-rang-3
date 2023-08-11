@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <limits.h>
 
-int	put_number(long n, int base)
+int	put_number(long long n, int base)
 {
 	char	*hex = "0123456789abcdef";
 	int 	len = 0;
@@ -63,7 +63,7 @@ int	ft_printf(const char *f, ...)
 			return (-1);
 		}
 		else if (*f == '%' && *(f + 1) == 'd')
-			len0 = put_number((long)va_arg(args, int), 10);
+			len0 = put_number((long long)va_arg(args, int), 10);
 		else if (*f == '%' && *(f + 1) == 'x')
 			len0 = put_number((long)va_arg(args, unsigned int), 16);
 		else if (*f == '%' && *(f + 1) == 's')
