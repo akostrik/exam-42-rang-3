@@ -12,7 +12,7 @@ int	put_number(long long n, int base)
 	{
 		if (write(1, "-", 1) < 0)
 			return (-1);
-		len = put_number(-n, base);
+		len = put_number(-n, base);	
 		if (len < 0)
 			return (-1);
 		return (1 + len);
@@ -57,12 +57,12 @@ int	ft_printf(const char *f, ...)
 	va_start(args, f);
 	while (*f)
 	{
-		if (*f == '%' && *(f + 1) != 'd' && *(f + 1) != 'x' && *(f + 1) != 's')
-		{
-			va_end(args);
-			return (-1);
-		}
-		else if (*f == '%' && *(f + 1) == 'd')
+		// if (*f == '%' && *(f + 1) != 'd' && *(f + 1) != 'x' && *(f + 1) != 's')
+		// {
+		// 	va_end(args);
+		//	return (-1);
+		//}
+		if (*f == '%' && *(f + 1) == 'd')
 			len0 = put_number((long long)va_arg(args, int), 10);
 		else if (*f == '%' && *(f + 1) == 'x')
 			len0 = put_number((long)va_arg(args, unsigned int), 16);
@@ -110,11 +110,11 @@ int main()
 	int n17  =    printf(""); printf(" (return %d)\n", n17);
 	int n18  = ft_printf(""); printf(" (return %d)\n\n", n18);
 
-	int n31  =    printf("\0"); printf(" (return %d)\n", n31);
-	int n32  = ft_printf("\0"); printf(" (return %d)\n\n", n32);
-
 	int n19  =    printf("", 42); printf(" (return %d)\n", n19);
 	int n20  = ft_printf("", 42); printf(" (return %d)\n\n", n20);
+
+	int n31  =    printf("\0"); printf(" (return %d)\n", n31);
+	int n32  = ft_printf("\0"); printf(" (return %d)\n\n", n32);
 
 	int n21  =    printf("%d %x %s"); printf(" (return %d)\n", n21);
 	int n22  = ft_printf("%d %x %s"); printf(" (return %d)\n\n", n22);
