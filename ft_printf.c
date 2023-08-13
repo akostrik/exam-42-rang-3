@@ -65,7 +65,7 @@ int	ft_printf(const char *f, ...)
 		if (*f == '%' && *(f + 1) == 'd')
 			len0 = put_number((long long)va_arg(args, int), 10);
 		else if (*f == '%' && *(f + 1) == 'x')
-			len0 = put_number((long)va_arg(args, unsigned int), 16);
+			len0 = put_number((long long)va_arg(args, unsigned int), 16);
 		else if (*f == '%' && *(f + 1) == 's')
 			len0 = put_str(va_arg(args, char *));
 		else
@@ -89,14 +89,17 @@ int main()
 	int n2  =    printf("%d %d %d %d %d %d %d %d", 0, 1, -1, 99, 100, 101, -42, 42+2); printf(" (return %d)\n", n2);
 	int n1  = ft_printf("%d %d %d %d %d %d %d %d", 0, 1, -1, 99, 100, 101, -42, 42+2); printf(" (return %d)\n\n", n1);
 
-	int n9  =    printf("%d %d %d %d %d %d %d %d", INT_MAX, INT_MIN, INT_MAX+1, INT_MIN-1, LONG_MAX, LONG_MAX + 1, LONG_MIN - 1, LONG_MIN); printf(" (return %d)\n", n9);
-	int n10 = ft_printf("%d %d %d %d %d %d %d %d", INT_MAX, INT_MIN, INT_MAX+1, INT_MIN-1, LONG_MAX, LONG_MAX + 1, LONG_MIN - 1, LONG_MIN); printf(" (return %d)\n\n", n10);
+	int n9  =    printf("%d %d %d %d %d %d", INT_MAX, INT_MAX+1, INT_MIN, INT_MIN-1, UINT_MAX, UINT_MAX + 1); printf(" (return %d)\n", n9);
+	int n10 = ft_printf("%d %d %d %d %d %d", INT_MAX, INT_MAX+1, INT_MIN, INT_MIN-1, UINT_MAX, UINT_MAX + 1); printf(" (return %d)\n\n", n10);
+
+	int n37  =   printf("%d %d %d %d %d %d", ULONG_MAX, ULONG_MAX + 1, LLONG_MAX, LLONG_MAX + 1, LLONG_MIN - 1, LLONG_MIN); printf(" (return %d)\n", n37);
+	int n38 = ft_printf("%d %d %d %d %d %d", ULONG_MAX, ULONG_MAX + 1, LLONG_MAX, LLONG_MAX + 1, LLONG_MIN - 1, LLONG_MIN); printf(" (return %d)\n\n", n38);
 
 	int n5  =    printf("%x %x %x %x %x %x %x %x", 0, 1, -1, 255, 256, 257, -42, 42+2); printf(" (return %d)\n", n5);
 	int n6  = ft_printf("%x %x %x %x %x %x %x %x", 0, 1, -1, 255, 256, 257, -42, 42+2); printf(" (return %d)\n\n", n6);
 
-	int n3  =    printf("%x %x %x %x %x %x %x %x", INT_MAX, INT_MIN, INT_MAX+1, INT_MIN-1, LONG_MAX, LONG_MAX + 1, LONG_MIN - 1, LONG_MIN); printf(" (return %d)\n", n3);
-	int n4  = ft_printf("%x %x %x %x %x %x %x %x", INT_MAX, INT_MIN, INT_MAX+1, INT_MIN-1, LONG_MAX, LONG_MAX + 1, LONG_MIN - 1, LONG_MIN); printf(" (return %d)\n\n", n4);
+	int n3  =    printf("%x %x %x %x %x %x %x %x %x %x", INT_MAX, INT_MAX+1, INT_MIN, INT_MIN-1, ULONG_MAX, ULONG_MAX + 1, LLONG_MAX, LLONG_MAX + 1, LLONG_MIN - 1, LLONG_MIN); printf(" (return %d)\n", n3);
+	int n4  = ft_printf("%x %x %x %x %x %x %x %x %x %x", INT_MAX, INT_MAX+1, INT_MIN, INT_MIN-1, ULONG_MAX, ULONG_MAX + 1, LLONG_MAX, LLONG_MAX + 1, LLONG_MIN - 1, LONG_MIN); printf(" (return %d)\n\n", n4);
 
 	int n7  =    printf("%s %s %s %s %s %s %s %s", NULL, "", "\0", "toto", " ", 0, "\n", "\t"); printf(" (return %d)\n", n7);
 	int n8  = ft_printf("%s %s %s %s %s %s %s %s", NULL, "", "\0", "toto", " ", 0, "\n", "\t"); printf(" (return %d)\n\n", n8);
