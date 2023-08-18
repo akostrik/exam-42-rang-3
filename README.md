@@ -5,7 +5,6 @@ s (string)
 d (decimal) 
 x (lowercase hexademical)
 ```
-
 Allowed functions : malloc, free, write, va_start, va_arg, va_copy and va_end
 
 Prototype : int ft_printf(const char *, ... )
@@ -25,7 +24,7 @@ out: Hexadecimal for 42 is 2a$
 ## get_next_line
 Allowed Functions : read, free, malloc
 
-Prototype : char	  *get_next_line(int fd);
+Prototype : char *get_next_line(int fd);
 
 The function returns a line that has been read from the file descriptor passed as parameter.
 
