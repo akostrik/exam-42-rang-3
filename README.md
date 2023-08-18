@@ -27,8 +27,8 @@ Allowed Functions : read, free, malloc
 Prototype : char *get_next_line(int fd);
 
 Return :
-1) The function returns a line that has been read from the file descriptor passed as parameter. What we call a "line that has been read" is a succesion of 0 to n characters that end with '\n' (ascii code 0x0a) or with End Of File (EOF).
-2) The line should be returned including the '\n' in case there is one at the end of the line that has been read.
+1) returns a line that has been read. "Line that has been read" = a succesion of 0 to n characters that end with '\n' or EOF.
+2) The line should be returned including the '\n' in case there is one at the end of the line read.
 3) When you've reached the EOF, you must store the current buffer in a char * and return it.
 4) If the buffer is empty you must return NULL.
 5) In case of error return NULL.

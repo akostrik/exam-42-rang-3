@@ -51,14 +51,12 @@ char	*take_a_line_of_the_list(t_list ***l)
 	int		i;
 	int		to_break = 0;
 
-	// printf("take_a_line_of_the_list\n");
-	// print_list(*l);
 	if (*l != NULL)
 	{
 		line = (char *)malloc(len_line(*l) + 1);
 		if (line == NULL)
 			return (NULL);
-		//printf("malloc str     in list_to_str  %p\n", str);
+		printf("malloc str     in list_to_str  %p\n", line);
 		cur = **l;
 		i = 0;
 		while(cur != NULL && to_break == 0)
@@ -70,12 +68,32 @@ char	*take_a_line_of_the_list(t_list ***l)
 			to_free = cur;
 			cur = cur->nxt;
 			**l = cur;
-			// printf("free   elt     in free_list    %p %c\n", to_free, to_free->c);
+			printf("free   elt     in free_list    %p %c\n", to_free, to_free->c);
 			free(to_free);
 		}
 		line[i] = '\0';
 	}
 	return (line);
+}
+
+void	free_list(t_list ***l)
+{
+	t_list	*cur;
+	t_list	*to_free;
+
+	if (*l != NULL)
+	{
+		cur = **l;
+		while(cur != NULL)
+		{
+			to_free = cur;
+			cur = cur->nxt;
+			printf("free   elt     in free_list    %p %c\n", to_free, to_free->c);
+			free(to_free);
+		}
+	}
+	printf("free   l       in free_list    %pc\n", l);
+	free(*l);
 }
 
 int	put_char_to_list(t_list ***l, char c)
@@ -90,7 +108,7 @@ int	put_char_to_list(t_list ***l, char c)
 	new = (t_list *)malloc(sizeof(t_list));
 	if (new == NULL)
 		return (-1);
-	//printf("malloc elt     in add_to_listr %p\n", new);
+	printf("malloc elt     in add_to_listr %p\n", new);
 	new->c = c;
 	new->nxt = NULL;
 	new->prv = cur;
@@ -114,7 +132,7 @@ int	put_buf_to_list(t_list ***l, int fd)
 	i = 0;
 	while (i < nb_read)
 		put_char_to_list(l, buf[i++]);
-	return (0);
+	return (nb_read);
 }
 
 char	*get_next_line(int fd)
@@ -130,22 +148,22 @@ char	*get_next_line(int fd)
 		l = (t_list **)malloc(sizeof(t_list *));
 		if (l == NULL)
 			return (NULL);
-		//printf("malloc l       in gnl          %p\n", l);
 		*l = NULL;
+		printf("malloc l       in gnl          %p\n", l);
+		if (put_buf_to_list(&l, fd) <= 0) // [ EOF ] or error
+			return (free_list(&l), l = NULL, NULL);
+		cur = *l;
 	}
 	while (1)
 	{
-		if (*l == NULL || (cur != NULL && cur->nxt == NULL && cur->c != '\n'))
+		if (cur->nxt == NULL && cur->c != '\n')
 		{
-			if (put_buf_to_list(&l, fd) == -1) // [ EOF ] or error
+			if (put_buf_to_list(&l, fd) <= 0) // [ EOF ] or error
 			{
-				line = take_a_line_of_the_list(&l);
-				free(l);
-				return (line);
+				line = take_a_line_of_the_list(&l); // free list
+				return (free_list(&l), l = NULL, line);
 			}
 			cur = *l;
-			// printf("\n");
-			// print_list(l);
 		}
 		if (cur->c == '\n')
 			return (take_a_line_of_the_list(&l));
@@ -155,21 +173,52 @@ char	*get_next_line(int fd)
 
 int main()
 {
-	char *str;
+	char *str = NULL;
 	int fd = open("text.txt", O_RDONLY);
 
+	str = NULL;
 	str = get_next_line(fd);
 	printf("main : [%s]\n", str);
-	//printf("free   str     in main         %p\n", str);
-	free(str);
+	if (str != NULL)
+	{
+		printf("free   str     in main         %p\n\n", str);
+		free(str);
+	}
 
+	str = NULL;
 	str = get_next_line(fd);
 	printf("main : [%s]\n", str);
-	//printf("free   str     in main         %p\n", str);
-	free(str);
+	if (str != NULL)
+	{
+		printf("free   str     in main         %p\n\n", str);
+		free(str);
+	}
 
+	str = NULL;
 	str = get_next_line(fd);
 	printf("main : [%s]\n", str);
-	//printf("free   str     in main         %p\n", str);
-	free(str);
+	if (str != NULL)
+	{
+		printf("free   str     in main         %p\n\n", str);
+		free(str);
+	}
+
+	str = NULL;
+	str = get_next_line(fd);
+	printf("main : [%s]\n", str);
+	if (str != NULL)
+	{
+		printf("free   str     in main         %p\n\n", str);
+		free(str);
+	}
+
+	str = NULL;
+	str = get_next_line(fd);
+	printf("main : [%s]\n", str);
+	if (str != NULL)
+	{
+		printf("free   str     in main         %p\n\n", str);
+		free(str);
+	}
+
 }
