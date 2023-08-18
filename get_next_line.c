@@ -49,8 +49,10 @@ char	*take_a_line_of_the_list(t_list ***l)
 	t_list	*to_free;
 	char	*line = NULL;
 	int		i;
+	int		to_break = 0;
 
-	printf("remove_and_return_line\n");
+	// printf("take_a_line_of_the_list\n");
+	// print_list(*l);
 	if (*l != NULL)
 	{
 		line = (char *)malloc(len_line(*l) + 1);
@@ -59,16 +61,16 @@ char	*take_a_line_of_the_list(t_list ***l)
 		//printf("malloc str     in list_to_str  %p\n", str);
 		cur = **l;
 		i = 0;
-		while(cur != NULL)
+		while(cur != NULL && to_break == 0)
 		{
 			line[i] = cur->c;
-			i++;
 			if (cur->c == '\n')	
-				break;
+				to_break = 1;
+			i++;
 			to_free = cur;
 			cur = cur->nxt;
 			**l = cur;
-			//printf("free   elt     in free_list    %p\n", to_free);
+			// printf("free   elt     in free_list    %p %c\n", to_free, to_free->c);
 			free(to_free);
 		}
 		line[i] = '\0';
@@ -118,7 +120,7 @@ int	put_buf_to_list(t_list ***l, int fd)
 char	*get_next_line(int fd)
 {
 	static t_list	**l = NULL;
-	static t_list			*cur;
+	static t_list	*cur = NULL;
 	char			*line;
 
 	if (BUFFER_SIZE < 1)
@@ -130,11 +132,10 @@ char	*get_next_line(int fd)
 			return (NULL);
 		//printf("malloc l       in gnl          %p\n", l);
 		*l = NULL;
-		cur = *l;
 	}
 	while (1)
 	{
-		if (cur == NULL || cur->nxt == NULL)
+		if (*l == NULL || (cur != NULL && cur->nxt == NULL && cur->c != '\n'))
 		{
 			if (put_buf_to_list(&l, fd) == -1) // [ EOF ] or error
 			{
@@ -143,8 +144,8 @@ char	*get_next_line(int fd)
 				return (line);
 			}
 			cur = *l;
-			printf("\n");
-			print_list(l);
+			// printf("\n");
+			// print_list(l);
 		}
 		if (cur->c == '\n')
 			return (take_a_line_of_the_list(&l));
