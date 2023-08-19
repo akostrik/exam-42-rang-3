@@ -51,7 +51,7 @@ char	*take_a_line_of_the_list(t_list ***l)
 	int		i;
 	int		to_break = 0;
 
-	if (*l != NULL)
+	if (*l != NULL && len_line(*l) > 0)
 	{
 		line = (char *)malloc(len_line(*l) + 1);
 		if (line == NULL)
@@ -70,6 +70,7 @@ char	*take_a_line_of_the_list(t_list ***l)
 			**l = cur;
 			printf("free   elt     in free_list    %p %c\n", to_free, to_free->c);
 			free(to_free);
+			to_free = NULL;
 		}
 		line[i] = '\0';
 	}
@@ -90,10 +91,12 @@ void	free_list(t_list ***l)
 			cur = cur->nxt;
 			printf("free   elt     in free_list    %p %c\n", to_free, to_free->c);
 			free(to_free);
+			to_free = NULL;
 		}
 	}
 	printf("free   l       in free_list    %pc\n", l);
 	free(*l);
+	*l = NULL;
 }
 
 int	put_char_to_list(t_list ***l, char c)
@@ -124,14 +127,12 @@ int	put_buf_to_list(t_list ***l, int fd)
 	t_list	*new = NULL;
 	char	buf[BUFFER_SIZE];
 	int		nb_read;
-	int		i;
+	int		i = 0;
 
 	nb_read = read(fd, buf, BUFFER_SIZE);
-	if (nb_read < 0) //// сымитировать
-		return (-1);
-	i = 0;
-	while (i < nb_read)
-		put_char_to_list(l, buf[i++]);
+	while (nb_read > 0 && i < nb_read) //// сымитировать
+		if (put_char_to_list(l, buf[i++]) == -1)
+			return (-1);
 	return (nb_read);
 }
 
@@ -150,18 +151,26 @@ char	*get_next_line(int fd)
 			return (NULL);
 		*l = NULL;
 		printf("malloc l       in gnl          %p\n", l);
-		if (put_buf_to_list(&l, fd) <= 0) // [ EOF ] or error
-			return (free_list(&l), l = NULL, NULL);
+		if (put_buf_to_list(&l, fd) < BUFFER_SIZE) // [ EOF ] or error
+		{
+			// printf("***************** take_a_line_of_the_list\n");
+			line = take_a_line_of_the_list(&l);
+			// printf("RETURN LINE %s\n", line);
+			return (free_list(&l), line);
+		}
 		cur = *l;
 	}
 	while (1)
 	{
-		if (cur->nxt == NULL && cur->c != '\n')
+		// printf("***************** while\n");
+		if (*l == NULL || (cur != NULL && cur->nxt == NULL && cur->c != '\n'))
 		{
-			if (put_buf_to_list(&l, fd) <= 0) // [ EOF ] or error
+			// printf("***************** should take buffer\n");
+			if (put_buf_to_list(&l, fd) < BUFFER_SIZE) // [ EOF ] or error
 			{
+				// printf("***************** take_a_line_of_the_list\n");
 				line = take_a_line_of_the_list(&l); // free list
-				return (free_list(&l), l = NULL, line);
+				return (free_list(&l), line);
 			}
 			cur = *l;
 		}
