@@ -44,7 +44,7 @@ int	put_char_to_list(t_list ***l, char c)
 	new->c = c;
 	new->nxt = NULL;
 	new->prv = cur;
-	if (**l == NULL)
+	if (**l == NULL)                       ////
 		**l = new;
 	else
 		cur->nxt = new;
@@ -60,7 +60,7 @@ int	put_buf_to_list(t_list ***l, t_list **cur_g, int fd)
 
 	nb_read = read(fd, buf, BUFFER_SIZE);
 	while (nb_read > 0 && i < nb_read)           ////
-		if (put_char_to_list(l, buf[i++]) == -1) ////
+		if (put_char_to_list(l, buf[i++]) == -1)
 			return (-1);
 	*cur_g = **l;                                ////
 	return (nb_read);
@@ -89,11 +89,11 @@ int	len_line(t_list **l)
 	while(cur != NULL)
 	{
 		len++;
-		if (cur->c == '\n')	
+		if (cur->c == '\n')
 			return (len);
 		cur = cur->nxt;
 	}
-	return (len);
+	return (len);                    ////
 }
 
 char	*take_a_line_of_the_list(t_list ***l, t_list **cur_g)
@@ -104,7 +104,7 @@ char	*take_a_line_of_the_list(t_list ***l, t_list **cur_g)
 	int		i;
 	int		to_break = 0;
 
-	if (*l != NULL && len_line(*l) > 0)
+	if (*l != NULL && len_line(*l) > 0)              ///
 	{
 		line = (char *)malloc(len_line(*l) + 1);
 		if (line == NULL)
@@ -115,7 +115,7 @@ char	*take_a_line_of_the_list(t_list ***l, t_list **cur_g)
 		{
 			line[i] = cur_l->c;
 			if (cur_l->c == '\n')	
-				to_break = 1;
+				to_break = 1;                        ////
 			i++;
 			to_free = cur_l;
 			cur_l = cur_l->nxt;
@@ -125,7 +125,7 @@ char	*take_a_line_of_the_list(t_list ***l, t_list **cur_g)
 		}
 		line[i] = '\0';
 	}
-	*cur_g = **l; ////
+	*cur_g = **l;                                    ////
 	return (line);
 }
 
@@ -146,7 +146,7 @@ void	free_list(t_list ***l)
 		}
 	}
 	free(*l);
-	*l = NULL; ////
+	*l = NULL;                         ////
 }
 
 char	*get_next_line(int fd)
@@ -163,7 +163,6 @@ char	*get_next_line(int fd)
 		l = (t_list **)malloc(sizeof(t_list *));
 		if (l == NULL)
 			return (NULL);
-		// printf("****** malloc list\n");
 		*l = NULL;
 	}
 	else if (there_is_a_complet_line_in_the_list(l))
@@ -171,19 +170,11 @@ char	*get_next_line(int fd)
 	while (1)
 	{
 		if (*l == NULL || cur_g == NULL || (cur_g->nxt == NULL && cur_g->c != '\n'))
-		{
-			nb_read = put_buf_to_list(&l, &cur_g, fd);
-			if (nb_read < BUFFER_SIZE) // [ A EOF ] [ EOF ] error
+			if (put_buf_to_list(&l, &cur_g, fd) < BUFFER_SIZE) // [ A EOF ] [ EOF ] error
 			{
-				// printf("****** nb_read = %d\n", nb_read);
 				line = take_a_line_of_the_list(&l, &cur_g);
-				// if (nb_read <= 0) // [ EOF ] error ////
-				// {
-					// printf("****** free list\n");
-					free_list(&l);
-				// }
+				free_list(&l);
 				return (line);
-			}
 		}
 		if (cur_g->c == '\n')
 			return (take_a_line_of_the_list(&l, &cur_g));
