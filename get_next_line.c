@@ -59,9 +59,9 @@ int	there_is_a_line_in_the_list(t_list **l)
 	return (0);
 }
 
-char	*take_a_line_of_the_list(t_list ***l)
+char	*take_a_line_of_the_list(t_list ***l, t_list **cur_g)
 {
-	t_list	*cur;
+	t_list	*cur_l;
 	t_list	*to_free;
 	char	*line = NULL;
 	int		i;
@@ -75,23 +75,24 @@ char	*take_a_line_of_the_list(t_list ***l)
 		if (line == NULL)
 			return (NULL);
 		// printf("malloc str     in list_to_str  %p\n", line);
-		cur = **l;
+		cur_l = **l;
 		i = 0;
-		while(cur != NULL && to_break == 0)
+		while(cur_l != NULL && to_break == 0)
 		{
-			line[i] = cur->c;
-			if (cur->c == '\n')	
+			line[i] = cur_l->c;
+			if (cur_l->c == '\n')	
 				to_break = 1;
 			i++;
-			to_free = cur;
-			cur = cur->nxt;
-			**l = cur;
+			to_free = cur_l;
+			cur_l = cur_l->nxt;
+			**l = cur_l;
 			// printf("free   elt     in free_list    %p %c\n", to_free, to_free->c);
 			free(to_free);
 			to_free = NULL;
 		}
 		line[i] = '\0';
 	}
+	*cur_g = **l;
 	return (line);
 }
 
@@ -140,7 +141,7 @@ int	put_char_to_list(t_list ***l, char c)
 	return (0);
 }
 
-int	put_buf_to_list(t_list ***l, int fd)
+int	put_buf_to_list(t_list ***l, t_list **cur_g, int fd)
 {
 	t_list	*new = NULL;
 	char	buf[BUFFER_SIZE];
@@ -151,13 +152,14 @@ int	put_buf_to_list(t_list ***l, int fd)
 	while (nb_read > 0 && i < nb_read) //// сымитировать
 		if (put_char_to_list(l, buf[i++]) == -1)
 			return (-1);
+	*cur_g = **l;
 	return (nb_read);
 }
 
 char	*get_next_line(int fd)
 {
 	static t_list	**l = NULL;
-	static t_list	*cur = NULL;
+	static t_list	*cur_g = NULL;
 	char			*line;
 	int				nb_read;
 
@@ -172,24 +174,23 @@ char	*get_next_line(int fd)
 		// printf("malloc l       in gnl          %p\n", l);
 	}
 	else if (there_is_a_line_in_the_list(l))
-		return (take_a_line_of_the_list(&l));
+		return (take_a_line_of_the_list(&l, &cur_g));
 	while (1)
 	{
-		if (*l == NULL || cur == NULL || (cur->nxt == NULL && cur->c != '\n'))
+		if (*l == NULL || cur_g == NULL || (cur_g->nxt == NULL && cur_g->c != '\n'))
 		{
-			nb_read = put_buf_to_list(&l, fd);
+			nb_read = put_buf_to_list(&l, &cur_g, fd);
 			if (nb_read < BUFFER_SIZE) // [ A EOF ]
 			{
-				line = take_a_line_of_the_list(&l);
+				line = take_a_line_of_the_list(&l, &cur_g);
 				if (nb_read <= 0) // [ EOF ] or error
 					free_list(&l);
 				return (line);
 			}
-			cur = *l;
 		}
-		if (cur->c == '\n')
-			return (take_a_line_of_the_list(&l));
-		cur = cur->nxt;
+		if (cur_g->c == '\n')
+			return (take_a_line_of_the_list(&l, &cur_g));
+		cur_g = cur_g->nxt;
 	}
 }
 
@@ -198,13 +199,13 @@ int main()
 	char *str = NULL;
 	int fd = open("text.txt", O_RDONLY);
 
-	str = NULL;
 	str = get_next_line(fd);
 	printf("main : [%s]\n", str);
 	if (str != NULL)
 	{
 		//printf("free   str     in main         %p\n\n", str);
 		free(str);
+		str = NULL;
 	}
 
 	str = NULL;
@@ -214,6 +215,7 @@ int main()
 	{
 		//printf("free   str     in main         %p\n\n", str);
 		free(str);
+		str = NULL;
 	}
 
 	str = NULL;
@@ -223,6 +225,7 @@ int main()
 	{
 		//printf("free   str     in main         %p\n\n", str);
 		free(str);
+		str = NULL;
 	}
 
 	str = NULL;
@@ -232,6 +235,7 @@ int main()
 	{
 		//printf("free   str     in main         %p\n\n", str);
 		free(str);
+		str = NULL;
 	}
 
 	str = NULL;
@@ -241,6 +245,6 @@ int main()
 	{
 		//printf("free   str     in main         %p\n\n", str);
 		free(str);
+		str = NULL;
 	}
-
 }
