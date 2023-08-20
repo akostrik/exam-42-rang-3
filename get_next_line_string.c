@@ -71,14 +71,14 @@ int	put_buf_to_list(t_list ***l, t_list **cur_g, int fd)
 {
 	t_list	*new = NULL;
 	char	buf[BUFFER_SIZE];
-	int		nb_read;
+	int		nb_read = -1;
 	int		i = 0;
 
 	nb_read = read(fd, buf, BUFFER_SIZE);
 	while (nb_read > 0 && i < nb_read)
 		if (put_char_to_list(l, buf[i++]) == -1)
 			return (-1);
-	*cur_g = **l; /////
+	*cur_g = **l;
 	return (nb_read);
 }
 
@@ -86,8 +86,6 @@ int	there_is_a_complet_line_in_the_list(t_list **l)
 {
 	t_list	*cur;
 
-	if (*l == NULL)
-		return (0);
 	cur = *l;
 	while(cur != NULL)
 	{
@@ -127,7 +125,7 @@ char	*take_a_line_of_the_list(t_list ***l, t_list **cur_g)
 		}
 		line[i] = '\0';
 	}
-	*cur_g = **l; ////
+	*cur_g = **l;
 	return (line);
 }
 
@@ -144,11 +142,9 @@ void	free_list(t_list ***l)
 			to_free = cur;
 			cur = cur->nxt;
 			free(to_free);
-			to_free = NULL;
 		}
 	}
 	free(*l);
-	*l = NULL; ////
 }
 
 char	*get_next_line(int fd)
@@ -158,7 +154,7 @@ char	*get_next_line(int fd)
 	char			*line;
 	int				nb_read;
 
-	if (fd < 0 || BUFFER_SIZE < 1)
+	if (fd < 0 || BUFFER_SIZE < 1) ////
 		return (NULL);
 	if (l == NULL)
 	{
@@ -167,11 +163,11 @@ char	*get_next_line(int fd)
 			return (NULL);
 		*l = NULL;
 	}
-	else if (there_is_a_complet_line_in_the_list(l))
-		return (take_a_line_of_the_list(&l, &cur_g));
 	while (1)
 	{
-		if (*l == NULL || cur_g == NULL || (cur_g->nxt == NULL && cur_g->c != '\n'))
+		if (there_is_a_complet_line_in_the_list(l))
+			return (take_a_line_of_the_list(&l, &cur_g));
+		if (*l == NULL || cur_g == NULL || (cur_g->c != '\n' && cur_g->nxt == NULL))
 		{
 			nb_read = put_buf_to_list(&l, &cur_g, fd);
 			if (nb_read < BUFFER_SIZE) // [ A EOF ]
@@ -182,9 +178,9 @@ char	*get_next_line(int fd)
 				return (line);
 			}
 		}
-		if (cur_g->c == '\n')
-			return (take_a_line_of_the_list(&l, &cur_g));
-		cur_g = cur_g->nxt;
+		// if (cur_g->c == '\n')
+		// 	return (take_a_line_of_the_list(&l, &cur_g));
+		// cur_g = cur_g->nxt;
 	}
 }
 
@@ -196,29 +192,49 @@ int main()
 	str = get_next_line(fd);
 	printf("main : [%s]\n", str);
 	if (str != NULL)
+	{
+		//printf("free   str     in main         %p\n\n", str);
 		free(str);
+		str = NULL;
+	}
 
 	str = NULL;
 	str = get_next_line(fd);
 	printf("main : [%s]\n", str);
 	if (str != NULL)
+	{
+		//printf("free   str     in main         %p\n\n", str);
 		free(str);
+		str = NULL;
+	}
 
 	str = NULL;
 	str = get_next_line(fd);
 	printf("main : [%s]\n", str);
 	if (str != NULL)
+	{
+		//printf("free   str     in main         %p\n\n", str);
 		free(str);
+		str = NULL;
+	}
 
 	str = NULL;
 	str = get_next_line(fd);
 	printf("main : [%s]\n", str);
 	if (str != NULL)
+	{
+		//printf("free   str     in main         %p\n\n", str);
 		free(str);
+		str = NULL;
+	}
 
 	str = NULL;
 	str = get_next_line(fd);
 	printf("main : [%s]\n", str);
 	if (str != NULL)
+	{
+		//printf("free   str     in main         %p\n\n", str);
 		free(str);
+		str = NULL;
+	}
 }
