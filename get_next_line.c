@@ -29,22 +29,6 @@ typedef struct	s_list
 	}
 }*/
 
-int	len_line(t_list **l)
-{
-	t_list	*cur;
-	int		len = 0;
-
-	cur = *l;
-	while(cur != NULL)
-	{
-		len++;
-		if (cur->c == '\n')	
-			return (len);
-		cur = cur->nxt;
-	}
-	return (len);
-}
-
 int	put_char_to_list(t_list ***l, char c)
 {
 	t_list	*new = NULL;
@@ -75,10 +59,10 @@ int	put_buf_to_list(t_list ***l, t_list **cur_g, int fd)
 	int		i = 0;
 
 	nb_read = read(fd, buf, BUFFER_SIZE);
-	while (nb_read > 0 && i < nb_read)
-		if (put_char_to_list(l, buf[i++]) == -1)
+	while (nb_read > 0 && i < nb_read)           ////
+		if (put_char_to_list(l, buf[i++]) == -1) ////
 			return (-1);
-	*cur_g = **l; /////
+	*cur_g = **l;                                ////
 	return (nb_read);
 }
 
@@ -86,8 +70,6 @@ int	there_is_a_complet_line_in_the_list(t_list **l)
 {
 	t_list	*cur;
 
-	if (*l == NULL)
-		return (0);
 	cur = *l;
 	while(cur != NULL)
 	{
@@ -96,6 +78,22 @@ int	there_is_a_complet_line_in_the_list(t_list **l)
 		cur = cur->nxt;
 	}
 	return (0);
+}
+
+int	len_line(t_list **l)
+{
+	t_list	*cur;
+	int		len = 0;
+
+	cur = *l;
+	while(cur != NULL)
+	{
+		len++;
+		if (cur->c == '\n')	
+			return (len);
+		cur = cur->nxt;
+	}
+	return (len);
 }
 
 char	*take_a_line_of_the_list(t_list ***l, t_list **cur_g)
@@ -165,6 +163,7 @@ char	*get_next_line(int fd)
 		l = (t_list **)malloc(sizeof(t_list *));
 		if (l == NULL)
 			return (NULL);
+		// printf("****** malloc list\n");
 		*l = NULL;
 	}
 	else if (there_is_a_complet_line_in_the_list(l))
@@ -174,11 +173,15 @@ char	*get_next_line(int fd)
 		if (*l == NULL || cur_g == NULL || (cur_g->nxt == NULL && cur_g->c != '\n'))
 		{
 			nb_read = put_buf_to_list(&l, &cur_g, fd);
-			if (nb_read < BUFFER_SIZE) // [ A EOF ]
+			if (nb_read < BUFFER_SIZE) // [ A EOF ] [ EOF ] error
 			{
+				// printf("****** nb_read = %d\n", nb_read);
 				line = take_a_line_of_the_list(&l, &cur_g);
-				if (nb_read <= 0) // [ EOF ] or error
+				// if (nb_read <= 0) // [ EOF ] error ////
+				// {
+					// printf("****** free list\n");
 					free_list(&l);
+				// }
 				return (line);
 			}
 		}
