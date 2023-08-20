@@ -19,6 +19,8 @@ void print_list(t_list **l)
 	t_list *cur;
 
 	printf("LIST %p %p:\n", l, *l);
+	if (*l == NULL)
+		printf("vide\n");
 	cur = *l;
 	while(cur != NULL)
 	{
@@ -37,10 +39,24 @@ int	len_line(t_list **l)
 	{
 		len++;
 		if (cur->c == '\n')	
-			break;
+			return (len);
 		cur = cur->nxt;
 	}
 	return (len);
+}
+
+int	there_is_a_line_in_the_list(t_list **l)
+{
+	t_list	*cur;
+
+	cur = *l;
+	while(cur != NULL)
+	{
+		if (cur->c == '\n')	
+			return (1);
+		cur = cur->nxt;
+	}
+	return (0);
 }
 
 char	*take_a_line_of_the_list(t_list ***l)
@@ -51,12 +67,14 @@ char	*take_a_line_of_the_list(t_list ***l)
 	int		i;
 	int		to_break = 0;
 
+	// printf("take_a_line_of_the_list\n");
+	// print_list(*l);
 	if (*l != NULL && len_line(*l) > 0)
 	{
 		line = (char *)malloc(len_line(*l) + 1);
 		if (line == NULL)
 			return (NULL);
-		printf("malloc str     in list_to_str  %p\n", line);
+		// printf("malloc str     in list_to_str  %p\n", line);
 		cur = **l;
 		i = 0;
 		while(cur != NULL && to_break == 0)
@@ -68,7 +86,7 @@ char	*take_a_line_of_the_list(t_list ***l)
 			to_free = cur;
 			cur = cur->nxt;
 			**l = cur;
-			printf("free   elt     in free_list    %p %c\n", to_free, to_free->c);
+			// printf("free   elt     in free_list    %p %c\n", to_free, to_free->c);
 			free(to_free);
 			to_free = NULL;
 		}
@@ -89,12 +107,12 @@ void	free_list(t_list ***l)
 		{
 			to_free = cur;
 			cur = cur->nxt;
-			printf("free   elt     in free_list    %p %c\n", to_free, to_free->c);
+			// printf("free   elt     in free_list    %p %c\n", to_free, to_free->c);
 			free(to_free);
 			to_free = NULL;
 		}
 	}
-	printf("free   l       in free_list    %pc\n", l);
+	// printf("free   l       in free_list    %pc\n", l);
 	free(*l);
 	*l = NULL;
 }
@@ -111,7 +129,7 @@ int	put_char_to_list(t_list ***l, char c)
 	new = (t_list *)malloc(sizeof(t_list));
 	if (new == NULL)
 		return (-1);
-	printf("malloc elt     in add_to_listr %p\n", new);
+	// printf("malloc elt     in add_to_listr %p\n", new);
 	new->c = c;
 	new->nxt = NULL;
 	new->prv = cur;
@@ -141,6 +159,7 @@ char	*get_next_line(int fd)
 	static t_list	**l = NULL;
 	static t_list	*cur = NULL;
 	char			*line;
+	int				nb_read;
 
 	if (BUFFER_SIZE < 1)
 		return (NULL);
@@ -150,27 +169,21 @@ char	*get_next_line(int fd)
 		if (l == NULL)
 			return (NULL);
 		*l = NULL;
-		printf("malloc l       in gnl          %p\n", l);
-		if (put_buf_to_list(&l, fd) < BUFFER_SIZE) // [ EOF ] or error
-		{
-			// printf("***************** take_a_line_of_the_list\n");
-			line = take_a_line_of_the_list(&l);
-			// printf("RETURN LINE %s\n", line);
-			return (free_list(&l), line);
-		}
-		cur = *l;
+		// printf("malloc l       in gnl          %p\n", l);
 	}
+	else if (there_is_a_line_in_the_list(l))
+		return (take_a_line_of_the_list(&l));
 	while (1)
 	{
-		// printf("***************** while\n");
-		if (*l == NULL || (cur != NULL && cur->nxt == NULL && cur->c != '\n'))
+		if (*l == NULL || cur == NULL || (cur->nxt == NULL && cur->c != '\n'))
 		{
-			// printf("***************** should take buffer\n");
-			if (put_buf_to_list(&l, fd) < BUFFER_SIZE) // [ EOF ] or error
+			nb_read = put_buf_to_list(&l, fd);
+			if (nb_read < BUFFER_SIZE) // [ A EOF ]
 			{
-				// printf("***************** take_a_line_of_the_list\n");
-				line = take_a_line_of_the_list(&l); // free list
-				return (free_list(&l), line);
+				line = take_a_line_of_the_list(&l);
+				if (nb_read <= 0) // [ EOF ] or error
+					free_list(&l);
+				return (line);
 			}
 			cur = *l;
 		}
@@ -190,7 +203,7 @@ int main()
 	printf("main : [%s]\n", str);
 	if (str != NULL)
 	{
-		printf("free   str     in main         %p\n\n", str);
+		//printf("free   str     in main         %p\n\n", str);
 		free(str);
 	}
 
@@ -199,7 +212,7 @@ int main()
 	printf("main : [%s]\n", str);
 	if (str != NULL)
 	{
-		printf("free   str     in main         %p\n\n", str);
+		//printf("free   str     in main         %p\n\n", str);
 		free(str);
 	}
 
@@ -208,7 +221,7 @@ int main()
 	printf("main : [%s]\n", str);
 	if (str != NULL)
 	{
-		printf("free   str     in main         %p\n\n", str);
+		//printf("free   str     in main         %p\n\n", str);
 		free(str);
 	}
 
@@ -217,7 +230,7 @@ int main()
 	printf("main : [%s]\n", str);
 	if (str != NULL)
 	{
-		printf("free   str     in main         %p\n\n", str);
+		//printf("free   str     in main         %p\n\n", str);
 		free(str);
 	}
 
@@ -226,7 +239,7 @@ int main()
 	printf("main : [%s]\n", str);
 	if (str != NULL)
 	{
-		printf("free   str     in main         %p\n\n", str);
+		//printf("free   str     in main         %p\n\n", str);
 		free(str);
 	}
 
