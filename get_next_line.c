@@ -1,9 +1,9 @@
 // #include <unistd.h>
 // #include <stdlib.h>
 // char *gnl(int fd) {
-//     char *s = malloc(10000), *c = s;
+//     char *s = mallo c(10000), *c = s;
 //     while (read(fd, c, 1) > 0 && *c++ != '\n');
-//     return c > s ? (*c = 0, s) : (free(s), NULL);
+//     return c > s ? (*c = 0, s) : (fre e(s), NULL);
 // }
 
 #include <stdio.h>
@@ -22,43 +22,46 @@ typedef struct	s_list
 	struct s_list	*nxt; 
 } t_list;
 
-/*void print_list(t_list **l)
+void print_list(t_list **l, t_list *cur_g, char *msg)
 {
 	t_list *cur;
 
-	printf("LIST %p %p:\n", l, *l);
-	if (*l == NULL)
-		printf("vide\n");
+	printf("LIST %14s : %14p : %p : ", msg, l, l == NULL ? 0 : *l);
+	printf("cur_g=%p\n", cur_g);
+	if (l == NULL)
+		return ;
 	cur = *l;
 	while(cur != NULL)
 	{
-		printf(" %p [%c] -> %p\n", cur, cur->c, cur->nxt);
+		printf("  %p [%c] -> %p\n", cur, cur->c == '\n' ? 'n' : cur->c, cur->nxt);
 		cur = cur->nxt;
 	}
-}*/
+	printf("\n");
+}
 
-int	put_char_to_list(t_list **ll, char c)
+int	put_char_to_list(t_list **l, char c)
 {
 	t_list	*new = NULL;
 	int		nb_read;
 	t_list	*cur;
 
-	cur = *ll;
+	cur = *l;
 	while(cur != NULL && cur->nxt != NULL)
 		cur = cur->nxt;
 	new = (t_list *)malloc(sizeof(t_list));
 	if (new == NULL)
 		return (-1);
 	new->c = c;
+	// printf("mal elt  %p %c\n", new, new->c);
 	new->nxt = NULL;
-	if (*ll == NULL)                            ////
-		*ll = new;
+	if (*l == NULL)                            ////
+		*l = new;
 	else
 		cur->nxt = new;
 	return (0);
 }
 
-int	put_buf_to_list(t_list **ll, t_list **cur_g, int fd)
+int	put_buf_to_list(t_list **l, t_list **cur_g, int fd)
 {
 	char	buf[BUFFER_SIZE];
 	int		nb_read;
@@ -66,13 +69,13 @@ int	put_buf_to_list(t_list **ll, t_list **cur_g, int fd)
 
 	nb_read = read(fd, buf, BUFFER_SIZE);
 	while (nb_read > 0 && i < nb_read)           ////
-		if (put_char_to_list(ll, buf[i++]) == -1)
+		if (put_char_to_list(l, buf[i++]) == -1)
 			return (-1);
-	*cur_g = *ll;                                ////
+	*cur_g = *l;                                ////
 	return (nb_read);
 }
 
-int	there_is_a_complet_line_in_the_list(t_list **l)
+int	there_is_a_line_with_n_in_the_list(t_list **l)
 {
 	t_list	*cur;
 
@@ -95,14 +98,14 @@ int	len_line(t_list **l)
 	while(cur != NULL)
 	{
 		if (cur->c == '\n')
-			return (len + 1);
+			return (len + 1);                      ////
 		cur = cur->nxt;
 		len++;
 	}
-	return (len + 1);                    ////
+	return (len);                                  ////
 }
 
-char	*take_a_line_of_the_list(t_list **ll, t_list **cur_g)
+char	*get_a_line_from_the_list(t_list **l, t_list **cur_g)
 {
 	t_list	*cur_l;
 	t_list	*to_free;
@@ -110,28 +113,45 @@ char	*take_a_line_of_the_list(t_list **ll, t_list **cur_g)
 	int		i;
 	int		to_break = 0;
 
-	if (ll == NULL || len_line(ll) == 0)              ///
+	if (l == NULL || len_line(l) == 0)             ////
 		return (NULL);
-	line = (char *)malloc(len_line(ll) + 1);
+	line = (char *)malloc(len_line(l) + 1);
 	if (line == NULL)
 		return (NULL);
-	cur_l = *ll;
+	cur_l = *l;
 	i = 0;
 	while(cur_l != NULL && to_break == 0)
 	{
 		line[i] = cur_l->c;
 		if (cur_l->c == '\n')	
-			to_break = 1;                        ////
+			to_break = 1;                           ////
 		i++;
 		to_free = cur_l;
 		cur_l = cur_l->nxt;
-		*ll = cur_l;
+		// printf("fre elt  %p %c\n", to_free, to_free->c);
 		free(to_free);
 		to_free = NULL;
 	}
 	line[i] = '\0';
-	*cur_g = *ll;                                    ////
+	*l = cur_l;                                     ////
+	*cur_g = *l;                                    ////
 	return (line);
+}
+
+t_list **initialize_list(t_list ***l, t_list **cur_g)
+{
+	*l = (t_list **)malloc(sizeof(t_list *));
+	// printf("mal list  %p\n", l);
+	if (*l == NULL)
+		return (NULL);
+	**l = NULL;
+	*cur_g = **l;
+	return(*l);
+}
+
+int	end_of_list_reached(t_list **l, t_list **cur_g)
+{
+	return (*l == NULL || *cur_g == NULL);
 }
 
 void	free_list(t_list ***l)
@@ -146,11 +166,13 @@ void	free_list(t_list ***l)
 		{
 			to_free = cur;
 			cur = cur->nxt;
+			// printf("fre elt  %p\n", to_free);
 			free(to_free);
 			to_free = NULL;
 		}
 	}
 	free(*l);
+	// printf("fre list %p\n", *l);
 	*l = NULL;                         ////
 }
 
@@ -158,31 +180,24 @@ char	*get_next_line(int fd)
 {
 	static t_list	**l = NULL;
 	static t_list	*cur_g = NULL;                    ////
+	static int		E0F_reached = 0;
 	char			*line;
 	int				nb_read;
 
 	if (fd < 0 || BUFFER_SIZE < 1)
 		return (NULL);
 	if (l == NULL)
-	{
-		l = (t_list **)malloc(sizeof(t_list *));
-		if (l == NULL)
-			return (NULL);
-		*l = NULL;
-	}
-	else if (there_is_a_complet_line_in_the_list(l))
-		return (take_a_line_of_the_list(l, &cur_g));   //// &cur_g
+		l = initialize_list(&l, &cur_g);
 	while (1)
 	{
-		if ((*l == NULL || cur_g == NULL || (cur_g->nxt == NULL && cur_g->c != '\n')) 
-		&& put_buf_to_list(l, &cur_g, fd) < BUFFER_SIZE) // [ A EOF ] [ EOF ] error
-		{
-			line = take_a_line_of_the_list(l, &cur_g);
-			free_list(&l);
-			return (line);
-		}
-		if (cur_g->c == '\n')
-			return (take_a_line_of_the_list(l, &cur_g));
+		if (there_is_a_line_with_n_in_the_list(l))
+			return (get_a_line_from_the_list(l, &cur_g));
+		if (end_of_list_reached(l, &cur_g))
+			E0F_reached = (put_buf_to_list(l, &cur_g, fd) < 1); // [ EOF ] error
+		if (!end_of_list_reached(l, &cur_g) && E0F_reached)
+			return (get_a_line_from_the_list(l, &cur_g));
+		if (end_of_list_reached(l, &cur_g) && E0F_reached)
+			return (free_list(&l), NULL);
 		cur_g = cur_g->nxt;
 	}
 }
@@ -191,33 +206,17 @@ int main()
 {
 	char *str = NULL;
 	int fd = open("text.txt", O_RDONLY);
+	int i;
 
-	str = get_next_line(fd);
-	printf("main : [%s]\n", str);
-	if (str != NULL)
-		free(str);
-
-	str = NULL;
-	str = get_next_line(fd);
-	printf("main : [%s]\n", str);
-	if (str != NULL)
-		free(str);
-
-	str = NULL;
-	str = get_next_line(fd);
-	printf("main : [%s]\n", str);
-	if (str != NULL)
-		free(str);
-
-	str = NULL;
-	str = get_next_line(fd);
-	printf("main : [%s]\n", str);
-	if (str != NULL)
-		free(str);
-
-	str = NULL;
-	str = get_next_line(fd);
-	printf("main : [%s]\n", str);
-	if (str != NULL)
-		free(str);
+	printf("\n");
+	i = 0;
+	while(i++ < 15)
+	{
+		str = NULL;
+		str = get_next_line(fd);
+		printf("%s", str);
+		if (str != NULL)
+			free(str);
+	}
+	printf("\n");
 }

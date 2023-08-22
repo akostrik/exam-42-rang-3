@@ -1,5 +1,8 @@
 
-a
-b
-cdnеf
-g
+A
+
+B
+
+C
+
+DEFG
