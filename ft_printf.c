@@ -10,7 +10,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <unistd.h>
-
+/*
 int ft_strlen(const char *str) {
     int len = 0;
     while (str[len])
@@ -115,12 +115,10 @@ int ft_pr_gpt(const char *format, ...) {
         
         format++;
     }
-    
     va_end(args);
-    
     return written_chars;
 }
-
+*/
 int	put_number(long long n, int base)
 {
 	char	*hex = "0123456789abcdef";
@@ -170,7 +168,7 @@ int	ft_printf(const char *f, ...)
 	int len0 = 0;
 	va_list	args;
 
-	if (f == NULL)
+	if (f == NULL)                              ////
 		return (-1);
 	va_start(args, f);
 	while (*f)
@@ -208,69 +206,52 @@ int main(){
 	
 	n =    printf("%d %d %d %d %d %d %d %d", 0, 1, -1, 99, 100, 101, -42, 42+2); printf(" (return %d)\n", n);
 	n = ft_printf("%d %d %d %d %d %d %d %d", 0, 1, -1, 99, 100, 101, -42, 42+2); printf(" (return %d)\n", n);
-	n = ft_pr_gpt("%d %d %d %d %d %d %d %d", 0, 1, -1, 99, 100, 101, -42, 42+2); printf(" (return %d)\n\n", n);
 
 	n =    printf("%d %d %d %d %d %d", INT_MAX, INT_MAX+1, INT_MIN, INT_MIN-1, UINT_MAX, UINT_MAX + 1); printf(" (return %d)\n", n);
 	n = ft_printf("%d %d %d %d %d %d", INT_MAX, INT_MAX+1, INT_MIN, INT_MIN-1, UINT_MAX, UINT_MAX + 1); printf(" (return %d)\n", n);
-	n = ft_pr_gpt("%d %d %d %d %d %d", INT_MAX, INT_MAX+1, INT_MIN, INT_MIN-1, UINT_MAX, UINT_MAX + 1); printf(" (return %d)\n\n", n);
 
 	n =   printf("%d %d %d %d %d %d", ULONG_MAX, ULONG_MAX + 1, LLONG_MAX, LLONG_MAX + 1, LLONG_MIN - 1, LLONG_MIN); printf(" (return %d)\n", n);
 	n = ft_printf("%d %d %d %d %d %d", ULONG_MAX, ULONG_MAX + 1, LLONG_MAX, LLONG_MAX + 1, LLONG_MIN - 1, LLONG_MIN); printf(" (return %d)\n", n);
-	n = ft_pr_gpt("%d %d %d %d %d %d", ULONG_MAX, ULONG_MAX + 1, LLONG_MAX, LLONG_MAX + 1, LLONG_MIN - 1, LLONG_MIN); printf(" (return %d)\n\n", n);
 
 	n =    printf("%x %x %x %x %x %x %x %x", 0, 1, -1, 255, 256, 257, -42, 42+2); printf(" (return %d)\n", n);
 	n = ft_printf("%x %x %x %x %x %x %x %x", 0, 1, -1, 255, 256, 257, -42, 42+2); printf(" (return %d)\n", n);
-	n = ft_pr_gpt("%x %x %x %x %x %x %x %x", 0, 1, -1, 255, 256, 257, -42, 42+2); printf(" (return %d)\n\n", n);
 
 	n =    printf("%x %x %x %x %x %x %x %x %x %x", INT_MAX, INT_MAX+1, INT_MIN, INT_MIN-1, ULONG_MAX, ULONG_MAX + 1, LLONG_MAX, LLONG_MAX + 1, LLONG_MIN - 1, LLONG_MIN); printf(" (return %d)\n", n);
 	n = ft_printf("%x %x %x %x %x %x %x %x %x %x", INT_MAX, INT_MAX+1, INT_MIN, INT_MIN-1, ULONG_MAX, ULONG_MAX + 1, LLONG_MAX, LLONG_MAX + 1, LLONG_MIN - 1, LONG_MIN); printf(" (return %d)\n", n);
-	n = ft_pr_gpt("%x %x %x %x %x %x %x %x %x %x", INT_MAX, INT_MAX+1, INT_MIN, INT_MIN-1, ULONG_MAX, ULONG_MAX + 1, LLONG_MAX, LLONG_MAX + 1, LLONG_MIN - 1, LONG_MIN); printf(" (return %d)\n\n", n);
 
 	n =    printf("%s %s %s %s %s %s %s %s", NULL, "", "\0", "toto", " ", 0, "\n", "\t"); printf(" (return %d)\n", n);
 	n = ft_printf("%s %s %s %s %s %s %s %s", NULL, "", "\0", "toto", " ", 0, "\n", "\t"); printf(" (return %d)\n", n);
-	n = ft_pr_gpt("%s %s %s %s %s %s %s %s", NULL, "", "\0", "toto", " ", 0, "\n", "\t"); printf(" (return %d)\n\n", n);
 
 //	n =    printf(NULL); printf(" (return %d)\n", n);
 //	n = ft_printf(NULL); printf(" (return %d)\n", n);
-//	n = ft_pr_gpt(NULL); printf(" (return %d)\n\n", n);
 
 //	n =    printf(NULL, 42); printf(" (return %d)\n", n);
 //	n = ft_printf(NULL, 42); printf(" (return %d)\n", n6);
-//	n = ft_pr_gpt(NULL, 42); printf(" (return %d)\n\n", n6);
 
 	n =    printf(""); printf(" (return %d)\n", n);
 	n = ft_printf(""); printf(" (return %d)\n", n);
-	n = ft_pr_gpt(""); printf(" (return %d)\n\n", n);
 
 	n =    printf("", 42); printf(" (return %d)\n", n);
 	n = ft_printf("", 42); printf(" (return %d)\n", n);
-	n = ft_pr_gpt("", 42); printf(" (return %d)\n\n", n);
 
 	n =    printf("\0"); printf(" (return %d)\n", n);
 	n = ft_printf("\0"); printf(" (return %d)\n", n);
-	n = ft_pr_gpt("\0"); printf(" (return %d)\n\n", n);
 
-	n =    printf("%d %x %s"); printf(" (retur %d)\n", n);
+	n =    printf("%d %x %s"); printf(" (return %d)\n", n);
 	n = ft_printf("%d %x %s"); printf(" (return %d)\n", n);
-	n = ft_pr_gpt("%d %x %s"); printf(" (return %d)\n\n", n);
 
 	n =    printf("%d %d %d", NULL, "toto", 99999999999999999999); printf(" (return %d)\n", n);
 	n = ft_printf("%d %d %d", NULL, "toto", 99999999999999999999); printf(" (return %d)\n", n);
-	n = ft_pr_gpt("%d %d %d", NULL, "toto", 99999999999999999999); printf(" (return %d)\n\n", n);
 
 	n=    printf("%x %x %x", NULL, "toto", 99999999999999999999); printf(" (return %d)\n", n);
 	n = ft_printf("%x %x %x", NULL, "toto", 99999999999999999999); printf(" (return %d)\n", n);
-	n = ft_pr_gpt("%x %x %x", NULL, "toto", 99999999999999999999); printf(" (return %d)\n\n", n);
 
 	n =    printf("test %j", 42); printf(" (return %d)\n", n);
 	n = ft_printf("test %j", 42); printf(" (return %d)\n", n);
-	n = ft_pr_gpt("test %j", 42); printf(" (return %d)\n\n", n);
 
 	n =    printf("test %z", 42); printf(" (return %d)\n", n);
 	n = ft_printf("test %z", 42); printf(" (return %d)\n", n);
-	n = ft_pr_gpt("test %z", 42); printf(" (return %d)\n\n", n);
 
 	n =    printf("test %", 42); printf(" (return %d)\n", n);
 	n = ft_printf("test %", 42); printf(" (return %d)\n", n);
-	n = ft_pr_gpt("test %", 42); printf(" (return %d)\n\n", n);
 }

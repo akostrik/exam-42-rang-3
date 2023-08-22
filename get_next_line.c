@@ -1,3 +1,11 @@
+// #include <unistd.h>
+// #include <stdlib.h>
+// char *gnl(int fd) {
+//     char *s = malloc(10000), *c = s;
+//     while (read(fd, c, 1) > 0 && *c++ != '\n');
+//     return c > s ? (*c = 0, s) : (free(s), NULL);
+// }
+
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -44,7 +52,7 @@ int	put_char_to_list(t_list ***l, char c)
 	new->c = c;
 	new->nxt = NULL;
 	new->prv = cur;
-	if (**l == NULL)                       ////
+	if (**l == NULL)                            ////
 		**l = new;
 	else
 		cur->nxt = new;
@@ -53,7 +61,6 @@ int	put_char_to_list(t_list ***l, char c)
 
 int	put_buf_to_list(t_list ***l, t_list **cur_g, int fd)
 {
-	t_list	*new = NULL;
 	char	buf[BUFFER_SIZE];
 	int		nb_read;
 	int		i = 0;
@@ -77,7 +84,7 @@ int	there_is_a_complet_line_in_the_list(t_list **l)
 			return (1);
 		cur = cur->nxt;
 	}
-	return (0);
+	return (0);                                  ////
 }
 
 int	len_line(t_list **l)
@@ -152,7 +159,7 @@ void	free_list(t_list ***l)
 char	*get_next_line(int fd)
 {
 	static t_list	**l = NULL;
-	static t_list	*cur_g = NULL;
+	static t_list	*cur_g = NULL;                    ////
 	char			*line;
 	int				nb_read;
 
@@ -166,7 +173,7 @@ char	*get_next_line(int fd)
 		*l = NULL;
 	}
 	else if (there_is_a_complet_line_in_the_list(l))
-		return (take_a_line_of_the_list(&l, &cur_g));
+		return (take_a_line_of_the_list(&l, &cur_g));   //// &cur_g
 	while (1)
 	{
 		if (*l == NULL || cur_g == NULL || (cur_g->nxt == NULL && cur_g->c != '\n'))
@@ -175,7 +182,7 @@ char	*get_next_line(int fd)
 				line = take_a_line_of_the_list(&l, &cur_g);
 				free_list(&l);
 				return (line);
-		}
+			}
 		if (cur_g->c == '\n')
 			return (take_a_line_of_the_list(&l, &cur_g));
 		cur_g = cur_g->nxt;
