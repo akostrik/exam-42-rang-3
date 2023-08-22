@@ -14,11 +14,11 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <string.h>
+#include "get_next_line.h"
 
 typedef struct	s_list
 {
 	char			c;
-	struct s_list	*prv; 
 	struct s_list	*nxt; 
 } t_list;
 
@@ -32,18 +32,18 @@ typedef struct	s_list
 	cur = *l;
 	while(cur != NULL)
 	{
-		printf(" %14p <- %p [%c] -> %p\n", cur->prv, cur, cur->c, cur->nxt);
+		printf(" %p [%c] -> %p\n", cur, cur->c, cur->nxt);
 		cur = cur->nxt;
 	}
 }*/
 
-int	put_char_to_list(t_list ***l, char c)
+int	put_char_to_list(t_list **ll, char c)
 {
 	t_list	*new = NULL;
 	int		nb_read;
 	t_list	*cur;
 
-	cur = **l;
+	cur = *ll;
 	while(cur != NULL && cur->nxt != NULL)
 		cur = cur->nxt;
 	new = (t_list *)malloc(sizeof(t_list));
@@ -51,15 +51,14 @@ int	put_char_to_list(t_list ***l, char c)
 		return (-1);
 	new->c = c;
 	new->nxt = NULL;
-	new->prv = cur;
-	if (**l == NULL)                            ////
-		**l = new;
+	if (*ll == NULL)                            ////
+		*ll = new;
 	else
 		cur->nxt = new;
 	return (0);
 }
 
-int	put_buf_to_list(t_list ***l, t_list **cur_g, int fd)
+int	put_buf_to_list(t_list **ll, t_list **cur_g, int fd)
 {
 	char	buf[BUFFER_SIZE];
 	int		nb_read;
@@ -67,9 +66,9 @@ int	put_buf_to_list(t_list ***l, t_list **cur_g, int fd)
 
 	nb_read = read(fd, buf, BUFFER_SIZE);
 	while (nb_read > 0 && i < nb_read)           ////
-		if (put_char_to_list(l, buf[i++]) == -1)
+		if (put_char_to_list(ll, buf[i++]) == -1)
 			return (-1);
-	*cur_g = **l;                                ////
+	*cur_g = *ll;                                ////
 	return (nb_read);
 }
 
@@ -95,15 +94,15 @@ int	len_line(t_list **l)
 	cur = *l;
 	while(cur != NULL)
 	{
-		len++;
 		if (cur->c == '\n')
-			return (len);
+			return (len + 1);
 		cur = cur->nxt;
+		len++;
 	}
-	return (len);                    ////
+	return (len + 1);                    ////
 }
 
-char	*take_a_line_of_the_list(t_list ***l, t_list **cur_g)
+char	*take_a_line_of_the_list(t_list **ll, t_list **cur_g)
 {
 	t_list	*cur_l;
 	t_list	*to_free;
@@ -111,12 +110,12 @@ char	*take_a_line_of_the_list(t_list ***l, t_list **cur_g)
 	int		i;
 	int		to_break = 0;
 
-	if (*l == NULL || len_line(*l) == 0)              ///
+	if (ll == NULL || len_line(ll) == 0)              ///
 		return (NULL);
-	line = (char *)malloc(len_line(*l) + 1);
+	line = (char *)malloc(len_line(ll) + 1);
 	if (line == NULL)
 		return (NULL);
-	cur_l = **l;
+	cur_l = *ll;
 	i = 0;
 	while(cur_l != NULL && to_break == 0)
 	{
@@ -126,12 +125,12 @@ char	*take_a_line_of_the_list(t_list ***l, t_list **cur_g)
 		i++;
 		to_free = cur_l;
 		cur_l = cur_l->nxt;
-		**l = cur_l;
+		*ll = cur_l;
 		free(to_free);
 		to_free = NULL;
 	}
 	line[i] = '\0';
-	*cur_g = **l;                                    ////
+	*cur_g = *ll;                                    ////
 	return (line);
 }
 
@@ -172,18 +171,18 @@ char	*get_next_line(int fd)
 		*l = NULL;
 	}
 	else if (there_is_a_complet_line_in_the_list(l))
-		return (take_a_line_of_the_list(&l, &cur_g));   //// &cur_g
+		return (take_a_line_of_the_list(l, &cur_g));   //// &cur_g
 	while (1)
 	{
-		if (*l == NULL || cur_g == NULL || (cur_g->nxt == NULL && cur_g->c != '\n'))
-			if (put_buf_to_list(&l, &cur_g, fd) < BUFFER_SIZE) // [ A EOF ] [ EOF ] error
-			{
-				line = take_a_line_of_the_list(&l, &cur_g);
-				free_list(&l);
-				return (line);
-			}
+		if ((*l == NULL || cur_g == NULL || (cur_g->nxt == NULL && cur_g->c != '\n')) 
+		&& put_buf_to_list(l, &cur_g, fd) < BUFFER_SIZE) // [ A EOF ] [ EOF ] error
+		{
+			line = take_a_line_of_the_list(l, &cur_g);
+			free_list(&l);
+			return (line);
+		}
 		if (cur_g->c == '\n')
-			return (take_a_line_of_the_list(&l, &cur_g));
+			return (take_a_line_of_the_list(l, &cur_g));
 		cur_g = cur_g->nxt;
 	}
 }
