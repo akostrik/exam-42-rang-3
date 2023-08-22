@@ -111,27 +111,26 @@ char	*take_a_line_of_the_list(t_list ***l, t_list **cur_g)
 	int		i;
 	int		to_break = 0;
 
-	if (*l != NULL && len_line(*l) > 0)              ///
+	if (*l == NULL || len_line(*l) == 0)              ///
+		return (NULL);
+	line = (char *)malloc(len_line(*l) + 1);
+	if (line == NULL)
+		return (NULL);
+	cur_l = **l;
+	i = 0;
+	while(cur_l != NULL && to_break == 0)
 	{
-		line = (char *)malloc(len_line(*l) + 1);
-		if (line == NULL)
-			return (NULL);
-		cur_l = **l;
-		i = 0;
-		while(cur_l != NULL && to_break == 0)
-		{
-			line[i] = cur_l->c;
-			if (cur_l->c == '\n')	
-				to_break = 1;                        ////
-			i++;
-			to_free = cur_l;
-			cur_l = cur_l->nxt;
-			**l = cur_l;
-			free(to_free);
-			to_free = NULL;
-		}
-		line[i] = '\0';
+		line[i] = cur_l->c;
+		if (cur_l->c == '\n')	
+			to_break = 1;                        ////
+		i++;
+		to_free = cur_l;
+		cur_l = cur_l->nxt;
+		**l = cur_l;
+		free(to_free);
+		to_free = NULL;
 	}
+	line[i] = '\0';
 	*cur_g = **l;                                    ////
 	return (line);
 }

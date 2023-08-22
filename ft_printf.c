@@ -212,6 +212,7 @@ int main(){
 
 	n =   printf("%d %d %d %d %d %d", ULONG_MAX, ULONG_MAX + 1, LLONG_MAX, LLONG_MAX + 1, LLONG_MIN - 1, LLONG_MIN); printf(" (return %d)\n", n);
 	n = ft_printf("%d %d %d %d %d %d", ULONG_MAX, ULONG_MAX + 1, LLONG_MAX, LLONG_MAX + 1, LLONG_MIN - 1, LLONG_MIN); printf(" (return %d)\n", n);
+	n = ft_pr_gpt("%d %d %d %d %d %d", ULONG_MAX, ULONG_MAX + 1, LLONG_MAX, LLONG_MAX + 1, LLONG_MIN - 1, LLONG_MIN); printf(" (return %d)\n\n", n);
 
 	n =    printf("%x %x %x %x %x %x %x %x", 0, 1, -1, 255, 256, 257, -42, 42+2); printf(" (return %d)\n", n);
 	n = ft_printf("%x %x %x %x %x %x %x %x", 0, 1, -1, 255, 256, 257, -42, 42+2); printf(" (return %d)\n", n);
@@ -237,7 +238,7 @@ int main(){
 	n =    printf("\0"); printf(" (return %d)\n", n);
 	n = ft_printf("\0"); printf(" (return %d)\n", n);
 
-	n =    printf("%d %x %s"); printf(" (return %d)\n", n);
+	n =    printf("%d %x %s"); printf(" (retur %d)\n", n);
 	n = ft_printf("%d %x %s"); printf(" (return %d)\n", n);
 
 	n =    printf("%d %d %d", NULL, "toto", 99999999999999999999); printf(" (return %d)\n", n);
